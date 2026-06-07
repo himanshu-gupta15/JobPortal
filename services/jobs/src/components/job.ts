@@ -605,16 +605,108 @@ export const createJob = TryCatch(
    UPDATE JOB
 ======================================================= */
 
-export const updateJob = TryCatch(
-  async (
-    req: AuthenticatedRequest,
-    res
-  ) => {
+// export const updateJob = TryCatch(
+//   async (
+//     req: AuthenticatedRequest,
+//     res
+//   ) => {
 
+//     const user = req.user;
+  
+//     if (!user) {
+
+//       throw new ErrorHandler(
+//         401,
+//         "Authentication required"
+//       );
+//     }
+
+//     if (user.role !== "recruiter") {
+
+//       throw new ErrorHandler(
+//         403,
+//         "Only recruiters can update jobs"
+//       );
+//     }
+
+//     const {
+//       title,
+//       description,
+//       salary,
+//       location,
+//       role,
+//       job_type,
+//       work_location,
+//       company_id,
+//       openings,
+//       is_active,
+//     } = req.body;
+
+//     const [existingJob] = await sql`
+
+//       SELECT posted_by_recruiter_id
+//       FROM jobs
+//       WHERE job_id = ${req.params.jobId}
+
+//     `;
+
+//     if (!existingJob) {
+
+//       throw new ErrorHandler(
+//         404,
+//         "Job not found"
+//       );
+//     }
+
+//     if (
+//       existingJob.posted_by_recruiter_id !==
+//       user.user_id
+//     ) {
+
+//       throw new ErrorHandler(
+//         403,
+//         "Unauthorized"
+//       );
+//     }
+
+//     const [updatedJob] = await sql`
+
+//       UPDATE jobs
+
+//       SET
+//         title = ${title},
+//         description = ${description},
+//         salary = ${salary},
+//         location = ${location},
+//         role = ${role},
+//         job_type = ${job_type},
+//         work_location = ${work_location},
+//         company_id = ${company_id},
+//         openings = ${openings},
+//         is_active = ${is_active}
+
+//       WHERE job_id = ${req.params.jobId}
+
+//       RETURNING *
+
+//     `;
+
+//     res.json({
+//       message:
+//         "Job updated successfully",
+
+//       job: updatedJob,
+//     });
+//   }
+// );
+
+
+
+export const updateJob = TryCatch(
+  async (req: AuthenticatedRequest, res) => {
     const user = req.user;
 
     if (!user) {
-
       throw new ErrorHandler(
         401,
         "Authentication required"
@@ -622,7 +714,6 @@ export const updateJob = TryCatch(
     }
 
     if (user.role !== "recruiter") {
-
       throw new ErrorHandler(
         403,
         "Only recruiters can update jobs"
@@ -637,21 +728,17 @@ export const updateJob = TryCatch(
       role,
       job_type,
       work_location,
-      company_id,
       openings,
       is_active,
     } = req.body;
 
     const [existingJob] = await sql`
-
-      SELECT posted_by_recruiter_id
+      SELECT *
       FROM jobs
       WHERE job_id = ${req.params.jobId}
-
     `;
 
     if (!existingJob) {
-
       throw new ErrorHandler(
         404,
         "Job not found"
@@ -662,7 +749,6 @@ export const updateJob = TryCatch(
       existingJob.posted_by_recruiter_id !==
       user.user_id
     ) {
-
       throw new ErrorHandler(
         403,
         "Unauthorized"
@@ -670,9 +756,7 @@ export const updateJob = TryCatch(
     }
 
     const [updatedJob] = await sql`
-
       UPDATE jobs
-
       SET
         title = ${title},
         description = ${description},
@@ -681,25 +765,18 @@ export const updateJob = TryCatch(
         role = ${role},
         job_type = ${job_type},
         work_location = ${work_location},
-        company_id = ${company_id},
         openings = ${openings},
         is_active = ${is_active}
-
       WHERE job_id = ${req.params.jobId}
-
       RETURNING *
-
     `;
 
     res.json({
-      message:
-        "Job updated successfully",
-
+      message: "Job updated successfully",
       job: updatedJob,
     });
   }
 );
-
 /* =======================================================
    GET ALL COMPANIES
 ======================================================= */

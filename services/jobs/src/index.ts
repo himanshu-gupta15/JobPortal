@@ -49,7 +49,7 @@ async function initDB() {
       role VARCHAR(255) NOT NULL,
       work_location work_location NOT NULL,
       company_id INTEGER NOT NULL REFERENCES companies(company_id) ON DELETE CASCADE,
-      posted_by_recuriter_id INTEGER NOT NULL,
+      posted_by_recruiter_id INTEGER NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       is_active BOOLEAN DEFAULT TRUE
     )`;
