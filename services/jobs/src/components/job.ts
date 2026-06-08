@@ -1049,6 +1049,17 @@ export const updateApplication =
 
       const { id } = req.params;
 
+      // Validate status
+      const validStatuses = ['Submitted', 'Rejected', 'Hired'];
+      if (!req.body.status || !validStatuses.includes(req.body.status)) {
+        throw new ErrorHandler(
+          400,
+          `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+        );
+      }
+
+      console.log(`[updateApplication] Fetching application with ID: ${id}`);
+
       const [application] = await sql`
 
         SELECT *
@@ -1057,6 +1068,8 @@ export const updateApplication =
 
       `;
 
+      console.log(`[updateApplication] Application found:`, application);
+
       if (!application) {
 
         throw new ErrorHandler(
@@ -1064,6 +1077,8 @@ export const updateApplication =
           "Application not found"
         );
       }
+
+      console.log(`[updateApplication] Fetching job with ID: ${application.job_id}`);
 
       const [job] = await sql`
 
@@ -1077,6 +1092,8 @@ export const updateApplication =
         ${application.job_id}
 
       `;
+
+      console.log(`[updateApplication] Job found:`, job);
 
       if (!job) {
 
@@ -1097,6 +1114,8 @@ export const updateApplication =
         );
       }
 
+      console.log(`[updateApplication] Updating application status to: ${req.body.status}`);
+
       const [updatedApplication] =
         await sql`
 
@@ -1110,6 +1129,15 @@ export const updateApplication =
         RETURNING *
 
       `;
+
+      console.log(`[updateApplication] Updated application:`, updatedApplication);
+
+      if (!updatedApplication) {
+        throw new ErrorHandler(
+          500,
+          "Failed to update application"
+        );
+      }
 
       const message = {
 

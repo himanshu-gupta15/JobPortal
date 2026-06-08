@@ -52,6 +52,9 @@ import jwt from "jsonwebtoken";
 import { publishToTopic } from "../producer.ts";
 import { forgotPasswordTemplate } from "../template.ts"
 import { redishClient } from "../index.ts";
+ import dotenv from "dotenv";
+ dotenv.config();
+ 
 
 export const registerUser = TryCatch(
   async (req: Request, res: Response) => {
@@ -238,6 +241,8 @@ return res.status(201).json({
 
 // })
 
+
+
 export const loginUser = TryCatch(
   async (req, res, next) => {
 
@@ -350,7 +355,8 @@ export const forgotPassword=TryCatch(async(req,res)=>{
   process.env.JWT_SEC as string,
   {expiresIn:"15m"}
  );
- const resetLink=`${process.env.Frontend_Url}/reset/${resetToken}`
+ console.log(process.env.FRONTEND_URL)
+ const resetLink=`${process.env.FRONTEND_URL}/reset/${resetToken}`
  await redishClient.set(`forgot:${email}`,resetToken,{
   EX:9000
  })
@@ -369,10 +375,67 @@ export const forgotPassword=TryCatch(async(req,res)=>{
   
 })
 
+// export const resetPassword = TryCatch(async (req, res) => {
+//   const token = decodeURIComponent(req.params.token);
+
+//   const { password } = req.body;
+
+//   let decoded: any;
+
+//   try {
+//     decoded = jwt.verify(
+//       token,
+//       process.env.JWT_SEC as string
+//     );
+//   } catch (error: any) {
+//     console.log(error);
+
+//     throw new ErrorHandler(400, error.message);
+//   }
+
+//   const email = decoded.email;
+
+//   const storedToken = await redisClient.get(`forgot:${email}`);
+
+//   if (!storedToken || storedToken !== token) {
+//     throw new ErrorHandler(400, "Token has expired");
+//   }
+
+//   const users = await sql`
+//     SELECT user_id 
+//     FROM users 
+//     WHERE email = ${email}
+//   `;
+
+//   if (users.length === 0) {
+//     throw new ErrorHandler(404, "User not found");
+//   }
+
+//   const hashedPassword = await bcrypt.hash(password, 10);
+
+//   await sql`
+//     UPDATE users
+//     SET password = ${hashedPassword}
+//     WHERE email = ${email}
+//   `;
+
+//   await redishClient.del(`forgot:${email}`);
+
+//   res.json({
+//     message: "Password changed successfully",
+//   });
+// });
+
 export const resetPassword = TryCatch(async (req, res) => {
   const token = decodeURIComponent(req.params.token);
-
   const { password } = req.body;
+
+  if (!password) {
+    throw new ErrorHandler(
+      "Password is required",
+      400
+    );
+  }
 
   let decoded: any;
 
@@ -384,28 +447,42 @@ export const resetPassword = TryCatch(async (req, res) => {
   } catch (error: any) {
     console.log(error);
 
-    throw new ErrorHandler(400, error.message);
+    throw new ErrorHandler(
+      error.message,
+      400
+    );
   }
 
   const email = decoded.email;
 
-  const storedToken = await redisClient.get(`forgot:${email}`);
+  const storedToken = await redishClient.get(
+    `forgot:${email}`
+  );
 
   if (!storedToken || storedToken !== token) {
-    throw new ErrorHandler(400, "Token has expired");
+    throw new ErrorHandler(
+      "Token has expired",
+      400
+    );
   }
 
   const users = await sql`
-    SELECT user_id 
-    FROM users 
+    SELECT user_id
+    FROM users
     WHERE email = ${email}
   `;
 
   if (users.length === 0) {
-    throw new ErrorHandler(404, "User not found");
+    throw new ErrorHandler(
+      "User not found",
+      404
+    );
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(
+    password,
+    10
+  );
 
   await sql`
     UPDATE users
@@ -413,9 +490,53 @@ export const resetPassword = TryCatch(async (req, res) => {
     WHERE email = ${email}
   `;
 
-  await redisClient.del(`forgot:${email}`);
+  await redishClient.del(
+    `forgot:${email}`
+  );
 
-  res.json({
+  return res.status(200).json({
+    success: true,
     message: "Password changed successfully",
   });
 });
+
+export const getUserById = TryCatch(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+      throw new ErrorHandler(
+        400,
+        "User ID is required"
+      );
+    }
+
+    const [user] = await sql`
+      SELECT
+        u.user_id,
+        u.name,
+        u.email,
+        u.phone_number,
+        u.role,
+        u.bio,
+        u.resume,
+        u.profile_pic,
+        u.subscription,
+        ARRAY_AGG(s.name) FILTER (WHERE s.name IS NOT NULL) as skills
+      FROM users u
+      LEFT JOIN user_skills us ON u.user_id = us.user_id
+      LEFT JOIN skills s ON us.skill_id = s.skill_id
+      WHERE u.user_id = ${id}
+      GROUP BY u.user_id
+    `;
+
+    if (!user) {
+      throw new ErrorHandler(
+        404,
+        "User not found"
+      );
+    }
+
+    return res.status(200).json(user);
+  }
+);

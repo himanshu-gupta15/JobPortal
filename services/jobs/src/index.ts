@@ -67,6 +67,16 @@ async function initDB() {
       UNIQUE(job_id, applicant_id)
     )`;
 
+    // Migrate column name from typo to correct spelling
+    try {
+      await sql`ALTER TABLE jobs RENAME COLUMN posted_by_recuriter_id TO posted_by_recruiter_id`;
+    } catch (error: any) {
+      // Column might already be renamed, ignore error
+      if (!error.message.includes('does not exist')) {
+        console.log('Column already has correct name or migration already applied');
+      }
+    }
+
     console.log("DB setup complete");
   } catch (error) {
     console.log("Error while creating tables", error);

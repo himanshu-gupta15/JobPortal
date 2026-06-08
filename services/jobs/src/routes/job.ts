@@ -14,6 +14,6 @@ router.get("/company/all",isAuth,getAllCompany);
 router.get("/company/:id",getCompanyDetails);
 router.get("/all",getAllActiveJobs);
 router.get("/:jobId",getSingleJob);
-router.get("application/:jobId",isAuth,getAllApplicationForJob);
+router.get("/application/:jobId",isAuth,getAllApplicationForJob);
 router.put("/application/:id",isAuth,updateApplication)
 export default router;

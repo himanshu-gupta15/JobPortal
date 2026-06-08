@@ -30,7 +30,7 @@
 
 
 import express from "express";
-import { forgotPassword, loginUser, registerUser, resetPassword } from "../controllers/auth.ts";
+import { forgotPassword, loginUser, registerUser, resetPassword, getUserById } from "../controllers/auth.ts";
 import uploadFile from "../middleware/multer.ts";
 
 const router = express.Router();
@@ -43,5 +43,6 @@ router.post(
 router.post("/login",loginUser)
 router.post("/forgot",forgotPassword)
 router.post("/reset/:token",resetPassword);
+router.get("/:id",getUserById);
 
 export default router;

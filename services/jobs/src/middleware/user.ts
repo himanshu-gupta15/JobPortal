@@ -28,6 +28,8 @@ export const isAuth = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    console.log("URL:", req.originalUrl);
+console.log("Authorization Header:", req.headers.authorization);
     const authHeader = req.headers.authorization;
 
     // FIX 1 -> startsWith spelling

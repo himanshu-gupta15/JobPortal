@@ -1,13 +1,9 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAuth = void 0;
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const db_ts_1 = require("../utils/db.ts");
-const isAuth = async (req, res, next) => {
+import jwt from "jsonwebtoken";
+import { sql } from "../utils/db.ts";
+export const isAuth = async (req, res, next) => {
     try {
+        console.log("URL:", req.originalUrl);
+        console.log("Authorization Header:", req.headers.authorization);
         const authHeader = req.headers.authorization;
         // FIX 1 -> startsWith spelling
         if (!authHeader || !authHeader.startsWith("Bearer")) {
@@ -18,7 +14,7 @@ const isAuth = async (req, res, next) => {
         }
         const token = authHeader.split(" ")[1];
         // FIX 2 -> proper type assertion
-        const decodedPayload = jsonwebtoken_1.default.verify(token, process.env.JWT_SEC);
+        const decodedPayload = jwt.verify(token, process.env.JWT_SEC);
         if (!decodedPayload || !decodedPayload.id) {
             res.status(401).json({
                 message: "Invalid token",
@@ -26,7 +22,7 @@ const isAuth = async (req, res, next) => {
             return;
         }
         // FIX 3 -> corrected SQL query
-        const users = await (0, db_ts_1.sql) `
+        const users = await sql `
       SELECT 
         u.user_id,
         u.name,
@@ -71,4 +67,3 @@ const isAuth = async (req, res, next) => {
         });
     }
 };
-exports.isAuth = isAuth;
