@@ -29,7 +29,7 @@ export const isAuth = async (
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-    console.log("Authorization Header:", req.headers.authorization);
+   
 
     // FIX 1 -> startsWith spelling
     if (!authHeader || !authHeader.startsWith("Bearer")) {

@@ -1,6 +1,6 @@
 import express from 'express';
-import { checkOut, paymentVerification } from '../controllers/payment';
-import { isAuth } from '../middleware/user';
+import { checkOut, paymentVerification } from '../controllers/payment.ts';
+import { isAuth } from '../middleware/user.ts';
 
 const router=express.Router();
 

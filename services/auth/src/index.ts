@@ -65,7 +65,7 @@ console.log(process.env.PORT)
 
 initDb().then(()=>{
  app.listen(PORT, () => {
-    console.log(process.env.Frontend_Url)
+ 
   console.log(`Auth service is running on http://localhost:${PORT}`);
 });
 })

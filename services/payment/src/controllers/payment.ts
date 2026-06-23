@@ -1,12 +1,13 @@
-import { TryCatch } from "../utils/TryCatch";
-
-import {AuthenthicatedRequest} from "../middleware/user.ts";
+import { TryCatch } from "../utils/TryCatch.ts";
+import crypto from "crypto";
+import type { AuthenticatedRequest } from "../middleware/user.ts";
 import ErrorHandler from "../utils/errorHandler.ts";
 import { sql } from "../utils/db.ts";
-import { instance } from "..";
+import { instance } from "../index.ts";
 
 
-export const checkOut=TryCatch(async(req:AuthenthicatedRequest,res)=>{
+
+export const checkOut=TryCatch(async(req:AuthenticatedRequest,res)=>{
     if(!req.user){
         throw new ErrorHandler(401,"No valid User");
 
@@ -46,9 +47,13 @@ export const checkOut=TryCatch(async(req:AuthenthicatedRequest,res)=>{
     });
     });
 
-    export const paymentVerification=TryCatch(async(req:AuthenthicatedRequest,res)=>{
+    export const paymentVerification=TryCatch(async(req:AuthenticatedRequest,res)=>{
         
         const user=req.user;
+
+        if(!user){
+            throw new ErrorHandler(401,"No valid User");
+        }
 
         const {razorpay_order_id,razorpay_payment_id,razorpay_signature}=req.body;
 
