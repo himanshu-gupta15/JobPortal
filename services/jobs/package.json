@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "-": "^0.0.1",
+    
     "@neondatabase/serverless": "^1.1.0",
     "axios": "^1.16.1",
     "cors": "^2.8.6",
