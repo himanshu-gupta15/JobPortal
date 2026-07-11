@@ -5,7 +5,7 @@ import app from "./app.ts";
 import { createClient } from "redis";
 console.log("REDIS_URL =", process.env.REDIS_URL);
 export const redishClient=createClient({
-    url:process.env.Redis_url,
+    url:process.env.REDIS_URL,
 
 });
 redishClient.connect().then(()=>console.log("connected to redish")).catch(console.error());
