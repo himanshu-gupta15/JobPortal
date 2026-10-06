@@ -1,6 +1,6 @@
-# HireHeaven: AI-Powered Job Portal
+# CareerLaunch: AI-Powered Job Portal
 
-HireHeaven is an advanced, event-driven, microservices-based job portal. It features multi-role accounts (Jobseekers & Recruiters), premium subscriptions with Razorpay, and state-of-the-art AI-powered features such as a Resume Analyzer and Career Advising Guide driven by Google's Gemini API.
+CareerLaunch is an advanced, event-driven, microservices-based job portal. It features multi-role accounts (Jobseekers & Recruiters), premium subscriptions with Razorpay, and state-of-the-art AI-powered features such as a Resume Analyzer and Career Advising Guide driven by Google's Gemini API.
 
 ---
 
