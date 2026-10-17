@@ -71,8 +71,8 @@ export const registerUser = TryCatch(
 
     if (!name || !email || !password || !phoneNumber || !role) {
       throw new ErrorHandler(
-        "Please fill all details",
-        400
+        400,
+        "Please fill all details"
       );
     }
 
@@ -85,8 +85,8 @@ export const registerUser = TryCatch(
 
     if (existingUser.length > 0) {
       throw new ErrorHandler(
-        "User with this email already exists",
-        409
+        409,
+        "User with this email already exists"
       );
     }
 
@@ -131,8 +131,8 @@ export const registerUser = TryCatch(
 
       if (!file) {
         throw new ErrorHandler(
-          "Resume file is required",
-          400
+          400,
+          "Resume file is required"
         );
       }
      console.log(file)
@@ -252,8 +252,8 @@ export const loginUser = TryCatch(
 
     if (!email || !password) {
       throw new ErrorHandler(
-        "Please fill all details",
-        400
+        400,
+        "Please fill all details"
       );
     }
 
@@ -290,8 +290,8 @@ export const loginUser = TryCatch(
 
     if (user.length === 0) {
       throw new ErrorHandler(
-        "Invalid credentials",
-        400
+        400,
+        "Invalid credentials"
       );
     }
 
@@ -305,8 +305,8 @@ export const loginUser = TryCatch(
 
     if (!matchPassword) {
       throw new ErrorHandler(
-        "Invalid credentials",
-        400
+        400,
+        "Invalid credentials"
       );
     }
 
@@ -432,8 +432,8 @@ export const resetPassword = TryCatch(async (req, res) => {
 
   if (!password) {
     throw new ErrorHandler(
-      "Password is required",
-      400
+      400,
+      "Password is required"
     );
   }
 
@@ -448,8 +448,8 @@ export const resetPassword = TryCatch(async (req, res) => {
     console.log(error);
 
     throw new ErrorHandler(
-      error.message,
-      400
+      400,
+      error.message
     );
   }
 
@@ -461,8 +461,8 @@ export const resetPassword = TryCatch(async (req, res) => {
 
   if (!storedToken || storedToken !== token) {
     throw new ErrorHandler(
-      "Token has expired",
-      400
+      400,
+      "Token has expired"
     );
   }
 
@@ -474,8 +474,8 @@ export const resetPassword = TryCatch(async (req, res) => {
 
   if (users.length === 0) {
     throw new ErrorHandler(
-      "User not found",
-      404
+      404,
+      "User not found"
     );
   }
 
