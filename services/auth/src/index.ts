@@ -8,7 +8,8 @@ export const redishClient=createClient({
     url:process.env.REDIS_URL,
 
 });
-redishClient.connect().then(()=>console.log("connected to redish")).catch(console.error());
+redishClient.on("error",(err)=>console.error("Redis error:",err.message));
+redishClient.connect().then(()=>console.log("connected to redish")).catch((err)=>console.error("Redis connect failed:",err.message));
 
 
 async function initDb(){
