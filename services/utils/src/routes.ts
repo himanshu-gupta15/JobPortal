@@ -18,6 +18,33 @@ const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Unknown error";
 
+const GEMINI_MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+const RETRYABLE_STATUS = [429, 500, 503];
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Retries transient Gemini errors (overloaded / rate limited), then falls back to a lighter model
+const generateWithRetry = async (
+  contents: Parameters<typeof ai.models.generateContent>[0]["contents"]
+) => {
+  let lastError: unknown;
+
+  for (const model of GEMINI_MODELS) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        return await ai.models.generateContent({ model, contents });
+      } catch (error: unknown) {
+        lastError = error;
+        const status = (error as { status?: number }).status;
+        if (!status || !RETRYABLE_STATUS.includes(status)) throw error;
+        await sleep(1000 * 2 ** attempt);
+      }
+    }
+  }
+
+  throw lastError;
+};
+
 const parseModelJson = (text: string | undefined) => {
   const rawText = text
     ?.replace(/```json/g, "")
@@ -124,10 +151,7 @@ The JSON object should have the following structure:
 }
 `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+    const response = await generateWithRetry(prompt);
 
     try {
       const jsonResponse = parseModelJson(response.text);
@@ -210,25 +234,22 @@ Focus on:
 - Section organization and flow
 `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: prompt,
+    const response = await generateWithRetry([
+      {
+        role: "user",
+        parts: [
+          {
+            text: prompt,
+          },
+          {
+            inlineData: {
+              mimeType: "application/pdf",
+              data: pdfBase64.replace(/^data:application\/pdf;base64,/, ""),
             },
-            {
-              inlineData: {
-                mimeType: "application/pdf",
-                data: pdfBase64.replace(/^data:application\/pdf;base64,/, ""),
-              },
-            },
-          ],
-        },
-      ],
-    });
+          },
+        ],
+      },
+    ]);
 
     try {
       const jsonResponse = parseModelJson(response.text);
