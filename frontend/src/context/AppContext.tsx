@@ -493,7 +493,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({
         }
        });
 
-       setApplications(data);
+       setApplications(Array.isArray(data) ? data : data.applications || []);
     }catch(error:any){
       console.error("Failed to fetch applications:", error);
       setApplications([]);
